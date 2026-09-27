@@ -4,3 +4,6 @@ node_modules
 .env
 
 api.http
+
+/backend/uploads/*
+!/backend/uploads/.gitkeep
