@@ -6,6 +6,7 @@ import fs from "fs";
 import User from "../models/user.model.js";
 import Profile from "../models/profile.model.js";
 import ConnectionRequest from "../models/connections.model.js";
+import Post from "../models/posts.model.js";
 
 const convertUserDataToPDF = async (userData) => {
 	const doc = new PDFDocument();
