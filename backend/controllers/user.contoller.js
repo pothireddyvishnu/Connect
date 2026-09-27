@@ -1,8 +1,39 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import PDFDocument from "pdfkit";
+import fs from "fs";
 
 import User from "../models/user.model.js";
 import Profile from "../models/profile.model.js";
+
+const convertUserDataToPDF = async (userData) => {
+	const doc = new PDFDocument();
+
+	const ouputPath = crypto.randomBytes(32).toString("hex") + ".pdf";
+	const stream = fs.createWriteStream("uploads/" + ouputPath);
+	doc.pipe(stream);
+
+	doc.image(`uploads/${userData.userId.profilePicture}`, {
+		align: "center",
+		width: 100,
+	});
+	doc.fontSize(14).text(`Name: ${userData.userId.name}`);
+	doc.fontSize(14).text(`Username: ${userData.userId.username}`);
+	doc.fontSize(14).text(`Email: ${userData.userId.email}`);
+	doc.fontSize(14).text(`Bio: ${userData.bio}`);
+	doc.fontSize(14).text(`Current Position: ${userData.currentPost}`);
+
+	doc.fontSize(14).text("Past Work: ");
+	userData.pastWork.forEach((work, index) => {
+		doc.fontSize(14).text(`Company Name: ${work.company}`);
+		doc.fontSize(14).text(`Position: ${work.position}`);
+		doc.fontSize(14).text(`Years: ${work.years}`);
+	});
+
+	doc.end();
+
+	return ouputPath;
+};
 
 export const register = async (req, res) => {
 	console.log(req.body);
@@ -167,6 +198,30 @@ export const getAllUserProfile = async (req, res) => {
 			"name email username profilePicture",
 		);
 		return res.json({ profiles });
+	} catch (error) {
+		return res.status(500).json({ message: error.message });
+	}
+};
+
+export const downloadProfile = async (req, res) => {
+	try {
+		const user_id = req.query.id;
+		if (!user_id) {
+			return res.status(400).json({ message: "User ID is required" });
+		}
+
+		const userProfile = await Profile.findOne({ userId: user_id }).populate(
+			"userId",
+			"name email username profilePicture",
+		);
+
+		if (!userProfile) {
+			return res.status(404).json({ message: "User profile not found" });
+		}
+
+		let outputPath = await convertUserDataToPDF(userProfile);
+
+		return res.json({ message: outputPath });
 	} catch (error) {
 		return res.status(500).json({ message: error.message });
 	}

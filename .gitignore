@@ -7,3 +7,4 @@ api.http
 
 /backend/uploads/*
 !/backend/uploads/.gitkeep
+!/backend/uploads/default.jpg
