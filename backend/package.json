@@ -9,7 +9,8 @@
 	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "nodemon server.js"
+		"dev": "nodemon server.js",
+		"prod": "node server.js"
 	},
 	"dependencies": {
 		"bcrypt": "^5.1.1",
